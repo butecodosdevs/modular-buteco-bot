@@ -3,7 +3,7 @@ import aiohttp
 from discord import app_commands
 from tools.constants import (
     BALANCE_API_URL, CLIENT_API_URL, COIN_API_URL,
-    BET_API_URL, AI_API_URL
+    BET_API_URL, AI_API_URL, POLITICAL_API_URL
 )
 import logging
 
@@ -25,7 +25,8 @@ def help_commands(bot):
             ("Client API", f"{CLIENT_API_URL}/health"),
             ("Coin API", f"{COIN_API_URL}/health"),
             ("Bet API", f"{BET_API_URL}/health"),
-            ("AI API", f"{AI_API_URL}/health")
+            ("AI API", f"{AI_API_URL}/health"),
+            ("Political API", f"{POLITICAL_API_URL}/health")
         ]
         
         embed = discord.Embed(
@@ -95,6 +96,11 @@ def help_commands(bot):
             ("/leaderboard [limite]", "Mostre os melhores usuários por saldo"),
             ("/history [limite]", "Veja seu histórico de transações"),
             ("/daily_history [limite]", "Veja seu histórico de coletas diárias"),
+            ("", ""),
+            ("🗳️ **Comandos Políticos**", ""),
+            ("/definir_posicao_politica <usuário> <x> <y>", "Define posição política no gráfico 2D"),
+            ("/ver_posicao_politica <usuário>", "Visualiza posição política de um usuário"),
+            ("/grafico_politico", "Mostra gráfico com todas as posições políticas"),
             ("", ""),
             ("🔧 **Comandos do Sistema**", ""),
             ("/status", "Verifique o status dos microserviços"),

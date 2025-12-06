@@ -71,6 +71,20 @@ services:
       - .env
     restart: unless-stopped
 
+  political-api:
+    build: ./political_api
+    container_name: political_api_container
+    ports:
+      - "5014:5000"
+    networks:
+      - buteco_network
+    depends_on:
+      - postgres-db
+      - client-api
+    env_file:
+      - .env
+    restart: unless-stopped
+
   buteco-bot:
     build: ./buteco_bot
     container_name: buteco_bot_container
@@ -83,6 +97,7 @@ services:
       - coin-api
       - bet-api
       - ai-api
+      - political-api
     env_file:
       - .env
     restart: unless-stopped

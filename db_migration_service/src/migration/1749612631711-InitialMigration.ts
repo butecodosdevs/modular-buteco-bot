@@ -9,6 +9,8 @@ export class InitialMigration1749612631711 implements MigrationInterface {
         await queryRunner.query(`CREATE TABLE "daily_claim" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "clientId" uuid NOT NULL, "balanceOperationId" uuid NOT NULL, "amount" integer NOT NULL, "description" text NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "PK_f4c05aef9a9674463af9efede58" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "bet_event" ("id" SERIAL NOT NULL, "title" character varying NOT NULL, "description" character varying, "option1" character varying NOT NULL, "option2" character varying NOT NULL, "isActive" boolean NOT NULL DEFAULT true, "isFinished" boolean NOT NULL DEFAULT false, "winningOption" integer, "totalBetAmount" integer NOT NULL DEFAULT '0', "option1BetAmount" integer NOT NULL DEFAULT '0', "option2BetAmount" integer NOT NULL DEFAULT '0', "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "PK_d0db616ca49c322e9b1b01f94c0" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "user_bet" ("id" SERIAL NOT NULL, "userId" character varying NOT NULL, "betEventId" integer NOT NULL, "chosenOption" integer NOT NULL, "amount" integer NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "PK_bfbb2b2bd801c8803f2b6537c45" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "political_position" ("id" uuid NOT NULL DEFAULT uuid_generate_v4(), "userId" uuid NOT NULL, "positionX" numeric(10,2) NOT NULL, "positionY" numeric(10,2) NOT NULL, "createdAt" TIMESTAMP NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "PK_c9341dea6e564fd5753d9809820" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`ALTER TABLE "political_position" ADD CONSTRAINT "FK_34ab9177909995b41407b29345d" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
@@ -17,6 +19,7 @@ export class InitialMigration1749612631711 implements MigrationInterface {
         await queryRunner.query(`DROP TABLE "daily_claim"`);
         await queryRunner.query(`DROP TABLE "balance_operation"`);
         await queryRunner.query(`DROP TABLE "user"`);
+        await queryRunner.query(`DROP TABLE "political_position"`);
     }
 
 }

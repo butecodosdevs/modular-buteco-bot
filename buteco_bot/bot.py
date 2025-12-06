@@ -7,6 +7,7 @@ from commands.balance import balance_commands
 from commands.bet import bet_commands
 from commands.help import help_commands
 from commands.ai import ai_commands
+from commands.political import political_commands
 
 
 logging.basicConfig(
@@ -22,6 +23,7 @@ balance_commands(bot)
 bet_commands(bot)
 help_commands(bot)
 ai_commands(bot)
+political_commands(bot)
 
 if not DISCORD_TOKEN:
     logger.error("DISCORD_TOKEN not found in environment variables!")
