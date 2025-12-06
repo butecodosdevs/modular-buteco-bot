@@ -36,6 +36,6 @@ class ButecoBot(commands.Bot):
         
         activity = discord.Activity(
             type=discord.ActivityType.watching,
-            name="a economia 💰"
+            name="For the comms to the comms"
         )
         await self.change_presence(activity=activity)

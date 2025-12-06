@@ -17,6 +17,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 bot = ButecoBot()
 
+# Register all commands with UI
 client_commands(bot)
 coins_commands(bot)
 balance_commands(bot)
