@@ -9,6 +9,7 @@ from tools.constants import POLITICAL_API_URL
 from ui.modals import PoliticalPositionModal
 from ui.views import ConfirmationView
 import logging
+from tools.utils import get_or_create_user
 
 logger = logging.getLogger(__name__)
 
@@ -25,17 +26,19 @@ def political_commands(bot):
             """Handle political position from modal"""
             await interaction.response.defer(ephemeral=True)
             
+            await get_or_create_user(str(user.id), user.display_name)
+
             async with aiohttp.ClientSession() as session:
                 data = {
                     "usuario": str(user.id),
                     "x": x,
                     "y": y
                 }
-                
+
                 status, response = await make_api_request(
                     session, 'POST', f"{POLITICAL_API_URL}/definir_posicao_politica", data
                 )
-                
+
                 if status == 200:
                     # Determine quadrant
                     if x > 0 and y > 0:
