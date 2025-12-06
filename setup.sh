@@ -15,7 +15,7 @@ if ! command -v docker &> /dev/null; then
     exit 1
 fi
 
-if ! command -v docker-compose &> /dev/null; then
+if ! command -v docker compose &> /dev/null; then
     echo "❌ Docker Compose is not installed. Please install Docker Compose first."
     echo "Visit: https://docs.docker.com/compose/install/"
     exit 1
@@ -62,7 +62,7 @@ docker volume rm -f butecobot-reloaded_economy_data
 
 echo ""
 echo "🔄 Building and starting the database migration service..."
-docker-compose run --rm db-migration-service npm run migration:run
+docker compose run --rm db-migration-service npm run migration:run
 
 echo ""
 echo "🚀 Starting Buteco Bot Ecosystem..."
@@ -76,14 +76,14 @@ echo "  - Discord Bot"
 echo "  - PostgreSQL Database"
 echo ""
 
-docker-compose up --build -d
+docker compose up --build -d
 
 echo "⏳ Waiting for containers to start..."
 sleep 10
 
 echo ""
 echo "📊 Container Status:"
-docker-compose ps
+docker compose ps
 
 echo ""
 echo "🔍 Health Checks:"
@@ -105,19 +105,19 @@ check_health "Bet API" "http://localhost:5013/health"
 check_health "GenAI API" "http://localhost:5015/health"
 
 # Discord bot health is via logs
-BOT_LOGS=$(docker-compose logs --tail=20 buteco-bot 2>/dev/null)
+BOT_LOGS=$(docker compose logs --tail=20 buteco-bot 2>/dev/null)
 if echo "$BOT_LOGS" | grep -q "Logged in as"; then
     echo "✅ Discord bot logged in successfully"
 else
-    echo "⚠️  Discord bot status unclear - check logs with: docker-compose logs buteco-bot"
+    echo "⚠️  Discord bot status unclear - check logs with: docker compose logs buteco-bot"
 fi
 
 echo ""
 echo "📋 Next Steps:"
 echo "1. Invite your Discord bot to a server (see README.md)"
 echo "2. Test bot commands like /help, /ai, /register, /balance, etc."
-echo "3. Check logs with: docker-compose logs [service-name]"
-echo "4. Stop with: docker-compose down"
+echo "3. Check logs with: docker compose logs [service-name]"
+echo "4. Stop with: docker compose down"
 echo ""
 echo "🎉 Setup complete! Your Buteco Bot Ecosystem is running!"
 
