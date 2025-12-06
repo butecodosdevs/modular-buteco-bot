@@ -38,7 +38,30 @@ def ai_commands(bot):
                 "amount": amount,
                 "description": f"Pagamento por uso do serviço de IA"
             }
-            
+
+            async with aiohttp.ClientSession() as session:
+                status, balance_data = await make_api_request(
+                    session, 'GET', f"{BALANCE_API_URL}/balance/{sender['id']}"
+                )
+
+                if status != 200:
+                    embed = discord.Embed(
+                        title="❌ Saldo Insuficiente",
+                        description=f"Você precisa de **{amount} moedas** para usar a IA.\\nUse `/ver_coins_ui` para verificar seu saldo.",
+                        color=discord.Color.red()
+                    )
+                    await interaction.followup.send(embed=embed)
+                    return
+
+            if balance_data['balance'] < amount:
+                embed = discord.Embed(
+                    title="❌ Saldo Insuficiente",
+                    description=f"Você precisa de **{amount} moedas** para usar a IA.\nUse `/ver_coins_ui` para verificar seu saldo.",
+                    color=discord.Color.red()
+                )
+                await interaction.followup.send(embed=embed)
+                return
+
             async with aiohttp.ClientSession() as session_payment:
                 status, response = await make_api_request(
                     session_payment, 'POST', f"{BALANCE_API_URL}/balance/subtract", data

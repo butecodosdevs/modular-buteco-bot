@@ -69,7 +69,7 @@ def political_commands(bot):
                 elif status == 404:
                     embed = discord.Embed(
                         title="❌ Usuário Não Encontrado",
-                        description=f"{user.mention} precisa se registrar primeiro usando `/registrar_ui`.",
+                        description=f"{user.mention} precisa se registrar primeiro usando `/registrar`.",
                         color=discord.Color.red()
                     )
                 else:
@@ -155,3 +155,149 @@ def political_commands(bot):
                 )
         
         await interaction.followup.send(embed=embed, ephemeral=True)
+
+    @bot.tree.command(name="grafico_politico", description="Mostra o gráfico com todas as posições políticas")
+    async def grafico_politico(interaction: discord.Interaction):
+        """Mostra todas as posições políticas em formato de gráfico visual."""
+        await interaction.response.defer(ephemeral=False)
+        
+        async with aiohttp.ClientSession() as session:
+            status, response = await make_api_request(
+                session, 'GET', f"{POLITICAL_API_URL}/grafico_politico"
+            )
+            
+            if status == 200:
+                positions = response.get('positions', [])
+                count = response.get('count', 0)
+                
+                if count == 0:
+                    embed = discord.Embed(
+                        title="📊 Gráfico Político",
+                        description="Nenhuma posição política foi definida ainda.\nUse `/definir_posicao_politica` para adicionar sua posição!",
+                        color=discord.Color.blue()
+                    )
+                    await interaction.followup.send(embed=embed, ephemeral=False)
+                    return
+                
+                # Generate the graph image
+                import matplotlib
+                matplotlib.use('Agg')  # Use non-interactive backend
+                import matplotlib.pyplot as plt
+                import io
+                
+                # Create figure and axis
+                fig, ax = plt.subplots(figsize=(12, 10))
+                
+                # Set up the plot
+                ax.set_xlim(-10, 10)
+                ax.set_ylim(-10, 10)
+                ax.set_xlabel('Esquerda ← → Direita', fontsize=14, fontweight='bold')
+                ax.set_ylabel('Libertário ↓ ↑ Autoritário', fontsize=14, fontweight='bold')
+                ax.set_title('Bússola Política dos Usuários', fontsize=18, fontweight='bold', pad=20)
+                
+                # Add grid
+                ax.grid(True, alpha=0.3, linestyle='--')
+                
+                # Draw axes at origin
+                ax.axhline(y=0, color='black', linewidth=2, alpha=0.5)
+                ax.axvline(x=0, color='black', linewidth=2, alpha=0.5)
+                
+                # Add quadrant labels with background
+                quadrant_style = dict(fontsize=11, alpha=0.6, style='italic', weight='bold')
+                ax.text(5, 5, 'Autoritário\nDireita', ha='center', va='center', **quadrant_style, color='blue')
+                ax.text(-5, 5, 'Autoritário\nEsquerda', ha='center', va='center', **quadrant_style, color='red')
+                ax.text(5, -5, 'Libertário\nDireita', ha='center', va='center', **quadrant_style, color='gold')
+                ax.text(-5, -5, 'Libertário\nEsquerda', ha='center', va='center', **quadrant_style, color='green')
+                
+                # Add quadrant background colors
+                ax.fill_between([-10, 0], 0, 10, alpha=0.1, color='red')
+                ax.fill_between([0, 10], 0, 10, alpha=0.1, color='blue')
+                ax.fill_between([-10, 0], -10, 0, alpha=0.1, color='green')
+                ax.fill_between([0, 10], -10, 0, alpha=0.1, color='gold')
+                
+                # Plot each position
+                colors = []
+                for pos in positions:
+                    x, y = pos.get('x', 0), pos.get('y', 0)
+                    # Determine color based on quadrant
+                    if x > 0 and y > 0:
+                        colors.append('blue')
+                    elif x < 0 and y > 0:
+                        colors.append('red')
+                    elif x > 0 and y < 0:
+                        colors.append('gold')
+                    else:
+                        colors.append('green')
+                
+                # Extract coordinates
+                x_coords = [pos.get('x', 0) for pos in positions]
+                y_coords = [pos.get('y', 0) for pos in positions]
+                
+                # Plot points
+                scatter = ax.scatter(x_coords, y_coords, c=colors, s=200, alpha=0.7, 
+                                    edgecolors='black', linewidths=2, zorder=5)
+                
+                # Add labels for each point
+                for pos in positions:
+                    x, y = pos.get('x', 0), pos.get('y', 0)
+                    name = pos.get('name', 'Unknown')[:10]  # Limit name length
+                    ax.annotate(name, (x, y), xytext=(5, 5), textcoords='offset points',
+                               fontsize=9, fontweight='bold',
+                               bbox=dict(boxstyle='round,pad=0.3', facecolor='white', alpha=0.8, edgecolor='gray'))
+                
+                # Add statistics box
+                quadrants = {"Auth-Dir": 0, "Auth-Esq": 0, "Lib-Dir": 0, "Lib-Esq": 0}
+                for pos in positions:
+                    x, y = pos.get('x', 0), pos.get('y', 0)
+                    if x > 0 and y > 0:
+                        quadrants["Auth-Dir"] += 1
+                    elif x < 0 and y > 0:
+                        quadrants["Auth-Esq"] += 1
+                    elif x > 0 and y < 0:
+                        quadrants["Lib-Dir"] += 1
+                    else:
+                        quadrants["Lib-Esq"] += 1
+                
+                stats_text = f"Total: {count} usuários\n"
+                stats_text += f"🟦 Auth-Dir: {quadrants['Auth-Dir']}\n"
+                stats_text += f"🟥 Auth-Esq: {quadrants['Auth-Esq']}\n"
+                stats_text += f"🟨 Lib-Dir: {quadrants['Lib-Dir']}\n"
+                stats_text += f"🟩 Lib-Esq: {quadrants['Lib-Esq']}"
+                
+                ax.text(0.02, 0.98, stats_text, transform=ax.transAxes,
+                       fontsize=10, verticalalignment='top',
+                       bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8))
+                
+                # Adjust layout
+                plt.tight_layout()
+                
+                # Save to bytes buffer
+                buf = io.BytesIO()
+                plt.savefig(buf, format='png', dpi=150, bbox_inches='tight')
+                buf.seek(0)
+                plt.close(fig)
+                
+                # Create Discord file
+                file = discord.File(buf, filename='grafico_politico.png')
+                
+                embed = discord.Embed(
+                    title="📊 Gráfico Político - Bússola Política",
+                    description=f"Posições políticas de {count} usuário(s)",
+                    color=discord.Color.blue()
+                )
+                embed.set_image(url="attachment://grafico_politico.png")
+                embed.set_footer(text=(
+                    "Use /definir_posicao_politica para adicionar ou atualizar sua posição\n"
+                    "Caso sua posição não esteja presente e você tenha feito no python legado, "
+                    "pegue os valores aqui: github.com/butecodosdevs/buteco-political-compass\n"
+                    "Caso não tenha feito o teste, utilize: politicalcompass.org/test/pt-pt"
+                ))
+                await interaction.followup.send(embed=embed, file=file, ephemeral=False)
+            else:
+                embed = discord.Embed(
+                    title="❌ Erro ao Buscar Gráfico",
+                    description="Ocorreu um erro ao buscar o gráfico político. Tente novamente mais tarde.",
+                    color=discord.Color.red()
+                )
+                await interaction.followup.send(embed=embed, ephemeral=False)
+
