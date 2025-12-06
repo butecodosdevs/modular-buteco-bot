@@ -6,22 +6,6 @@ A comprehensive Discord bot ecosystem built with Docker containers, featuring ec
 
 The Buteco Bot provides a complete economy system and AI assistant through Discord slash commands:
 
-### 💰 Economy Commands
-- `/register` - Join the economy system
-- `/daily` - Claim daily coins (100 coins/day)
-- `/balance [user]` - Check coin balance
-- `/transfer <user> <amount>` - Send coins to other users
-- `/leaderboard` - View top users by balance
-- `/history` - View transaction history
-
-### 🤖 AI Commands
-- `/ai <prompt> [provider] [system_prompt] [model]` - Ask the AI (OpenAI, Gemini, etc.) any question or request
-
-### 📊 Information Commands  
-- `/status` - Check all microservices health
-- `/help` - Show all available commands
-- `/daily_history` - View daily claim history
-
 ## 🚀 Quick Start
 
 1. **Setup the system:**
@@ -48,8 +32,6 @@ The system uses a microservices architecture with Docker containers communicatin
 
 for implement your microsservice see the [MICROSERVICE_GUIDE](MICROSERVICE_GUIDE.md) 
 
-![System Architeture](image.png)
-
 ## Features
 
 - Virtual coin system with daily rewards
@@ -70,11 +52,36 @@ Each microservice has its own README with usage and endpoints:
 - `coin_api/README.md` - Daily coins
 - `bet_api/README.md` - Betting system
 - `ai_api/README.md` - AI assistant
+- `political_api/README.md` - Political system
+
+```mermaid
+graph TD
+    %% Define Nodes with Icons (Using default Mermaid shapes for containers)
+    subgraph Services
+        A[db-migration-service]
+        B[ai-api]
+        C[buteco-bot]
+        D[coin-api]
+        E[balance-api]
+        F[client-api]
+        G[bet-api]
+        H[political-api]
+    end
+
+    H{db}
+
+    %% Connections
+    A --> H
+    B --> H
+    C --> H
+    D --> H
+    E --> H
+    F --> H
+    G --> H
+
+```
 
 ## Development & Contribution
-
-- Follow PEP 8 for Python code
-- Add docstrings and error handling
 - Test API endpoints and bot commands
 - See each microservice's README for details
 
@@ -95,4 +102,4 @@ Each microservice has its own README with usage and endpoints:
 This project is open source and available under the MIT License.
 
 ---
-*Built with ❤️ using Docker, Python, Discord.py, and FastAPI*
+*Built with ❤️*
