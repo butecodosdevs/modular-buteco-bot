@@ -85,6 +85,20 @@ services:
       - .env
     restart: unless-stopped
 
+  challenge-api:
+    build: ./challenge_api
+    container_name: challenge_api_container
+    ports:
+      - "5016:5000"
+    networks:
+      - buteco_network
+    depends_on:
+      - postgres-db
+      - client-api
+    env_file:
+      - .env
+    restart: unless-stopped
+
   buteco-bot:
     build: ./buteco_bot
     container_name: buteco_bot_container
@@ -98,6 +112,7 @@ services:
       - bet-api
       - ai-api
       - political-api
+      - challenge-api
     env_file:
       - .env
     restart: unless-stopped
