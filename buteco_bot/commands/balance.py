@@ -103,7 +103,7 @@ def balance_commands(bot):
     @requires_registration()
     async def top_patroes(interaction: discord.Interaction, limit: int = 10):
         """Show leaderboard of users by balance."""
-        await interaction.response.defer(ephemeral=True)
+        await interaction.response.defer()
         
         if limit > 20:
             limit = 20
@@ -159,7 +159,7 @@ def balance_commands(bot):
             if not user_balances:
                 embed.description = "Nenhum usuário encontrado no ranking."
         
-        await interaction.followup.send(embed=embed, ephemeral=True)
+        await interaction.followup.send(embed=embed)
 
     @bot.tree.command(name="extrato", description="Veja seu histórico de transações")
     @app_commands.describe(limit="Número de transações para mostrar (máximo 50)")

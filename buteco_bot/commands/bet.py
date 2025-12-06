@@ -67,7 +67,7 @@ def bet_commands(bot):
                 embed.add_field(name="Opção 2", value=f"🅱️ {option2}", inline=True)
                 embed.add_field(
                     name="Como Apostar",
-                    value=f"Use `/bet_place {event_id} 1 [valor]` ou `/bet_place {event_id} 2 [valor]`",
+                    value=f"Use `/evento_apostar {event_id} 1 [valor]` ou `/evento_apostar {event_id} 2 [valor]`",
                     inline=False
                 )
                 embed.set_footer(text=f"Criado por {interaction.user.display_name}")

@@ -35,9 +35,10 @@ def ai_commands(bot):
             "description": f"Pagamento por uso do serviço de IA: {prompt}"
         }
 
-        status, response = await make_api_request(
-            session, 'POST', f"{BALANCE_API_URL}/balance/subtract", data
-        )
+        async with aiohttp.ClientSession() as session_payment:
+            status, response = await make_api_request(
+                session_payment, 'POST', f"{BALANCE_API_URL}/balance/subtract", data
+            )
         
         if status != 200:
             embed = discord.Embed(
@@ -45,6 +46,8 @@ def ai_commands(bot):
                 description="Falha ao pagar pelo uso do serviço de IA. Verifique seu saldo.",
                 color=discord.Color.red()
             )
+            await interaction.followup.send(embed=embed)
+            return
 
         await interaction.response.defer()
         payload = {"prompt": prompt}
@@ -52,10 +55,12 @@ def ai_commands(bot):
             payload["provider"] = provider
         if system_prompt:
             payload["systemPrompt"] = system_prompt
-        async with aiohttp.ClientSession() as session:
+            
+        async with aiohttp.ClientSession() as session_ai:
             status, response = await make_api_request(
-                session, 'POST', f"{AI_API_URL}/GenAI/generate", payload
+                session_ai, 'POST', f"{AI_API_URL}/GenAI/generate", payload
             )
+            
         if status == 200 and response and isinstance(response, dict) and response.get("text"):
             response_header = f"Prompt: {prompt}\n\n"
             response_body = response.get("text", "Falha ao obter resposta da IA.")

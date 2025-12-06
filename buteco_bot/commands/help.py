@@ -59,7 +59,7 @@ def help_commands(bot):
             inline=True
         )
         
-        await interaction.followup.send(embed=embed, ephemeral=True)
+        await interaction.followup.send(embed=embed)
 
     @bot.tree.command(name="help", description="Mostre todos os comandos disponíveis")
     async def help(interaction: discord.Interaction):
@@ -129,7 +129,7 @@ def help_commands(bot):
     @bot.tree.command(name="codigo", description="Pega o repositório do bot no GitHub")
     async def codigo(interaction: discord.Interaction):
         """Get the bot's source code repository."""
-        await interaction.response.defer(ephemeral=True)
+        await interaction.response.defer()
         
         embed = discord.Embed(
             title="📂 Código do Bot",
@@ -143,7 +143,7 @@ def help_commands(bot):
         )
         embed.set_thumbnail(url="https://github.com/butecodosdevs/butecobot-reloaded")
         embed.set_footer(text="Aceita Contribuições em qualquer linguagem \n\nLeia o README.md e siga o MICROSERVICE_GUIDE.md !")
-        await interaction.followup.send(embed=embed, ephemeral=True)
+        await interaction.followup.send(embed=embed)
 
 
 
