@@ -245,10 +245,9 @@ def political_commands(bot):
                 embed.set_image(url="attachment://grafico_politico.png")
                 embed.set_footer(text=(
                     "Use /definir_posicao_politica para adicionar ou atualizar sua posição\n"
-                    "caso sua posição não esteja presente e voce tenha feito no python legado, "
-                    "pegue os valores [aqui](https://github.com/butecodosdevs/buteco-political-compass/blob/main/src/points.csv) e faça `/definir_posicao_politica <x> <y>`"
-                    "\n"
-                    "caso não tenha feito o teste utilize o site [policalcompass.org](https://www.politicalcompass.org/test/pt-pt?page=1)"
+                    "Caso sua posição não esteja presente e você tenha feito no python legado, "
+                    "pegue os valores aqui: github.com/butecodosdevs/buteco-political-compass\n"
+                    "Caso não tenha feito o teste, utilize: politicalcompass.org/test/pt-pt"
                 ))
                 await interaction.followup.send(embed=embed, file=file, ephemeral=False)
             else:
