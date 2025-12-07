@@ -4,6 +4,8 @@ import { BalanceOperation } from "./src/entity/BalanceOperation";
 import { DailyClaim } from "./src/entity/DailyClaim";
 import { BetEvent } from "./src/entity/BetEvent";
 import { UserBet } from "./src/entity/UserBet";
+import { PoliticalPosition } from "./src/entity/PoliticalPosition";
+import { Challenge } from "./src/entity/Challenge";
 import * as dotenv from "dotenv";
 dotenv.config();
 
@@ -17,7 +19,7 @@ export default new DataSource({
     database: process.env.DB_NAME,
     synchronize: false,
     logging: false,
-    entities: [User, BalanceOperation, DailyClaim, BetEvent, UserBet],
+    entities: [User, BalanceOperation, DailyClaim, BetEvent, UserBet, PoliticalPosition, Challenge],
     migrations: ["src/migration/**/*.ts"],
     subscribers: [],
 });

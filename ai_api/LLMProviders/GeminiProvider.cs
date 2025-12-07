@@ -27,7 +27,7 @@ public class GeminiProvider : ILLMProvider
     {
         try
         {
-            var modelName = model ?? "gemini-1.5-flash";
+            var modelName = model ?? "gemini-2.0-flash";
             
             var apiUrl = $"https://generativelanguage.googleapis.com/v1/models/{modelName}:generateContent?key={_apiKey}";
 

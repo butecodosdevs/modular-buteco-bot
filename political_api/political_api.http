@@ -1,0 +1,66 @@
+### Political API Integration Tests
+
+# Health Check
+GET http://localhost:5014/health
+
+###
+
+# Set Political Position
+POST http://localhost:5014/definir_posicao_politica
+Content-Type: application/json
+
+{
+  "usuario": "123456789",
+  "x": -2.13,
+  "y": -1.95
+}
+
+###
+
+# Set Another Political Position
+POST http://localhost:5014/definir_posicao_politica
+Content-Type: application/json
+
+{
+  "usuario": "987654321",
+  "x": 3.5,
+  "y": 4.2
+}
+
+###
+
+# Get Political Position by User
+GET http://localhost:5014/ver_posicao_politica/123456789
+
+###
+
+# Get All Political Positions (Graph Data)
+GET http://localhost:5014/grafico_politico
+
+###
+
+# Test Invalid Coordinates (should fail)
+POST http://localhost:5014/definir_posicao_politica
+Content-Type: application/json
+
+{
+  "usuario": "123456789",
+  "x": 15.0,
+  "y": -1.95
+}
+
+###
+
+# Test Missing Fields (should fail)
+POST http://localhost:5014/definir_posicao_politica
+Content-Type: application/json
+
+{
+  "usuario": "123456789",
+  "x": -2.13
+}
+
+###
+
+# Test Non-existent User Position
+GET http://localhost:5014/ver_posicao_politica/999999999

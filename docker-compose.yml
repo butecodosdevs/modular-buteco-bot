@@ -54,7 +54,7 @@ services:
     restart: unless-stopped
 
   ai-api:
-    build: 
+    build:
       context: .
       dockerfile: ./ai_api/Dockerfile
     container_name: ai_api_container
@@ -67,6 +67,34 @@ services:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - GENAI_DEFAULT_PROVIDER=${GENAI_DEFAULT_PROVIDER:-openai}
+    env_file:
+      - .env
+    restart: unless-stopped
+
+  political-api:
+    build: ./political_api
+    container_name: political_api_container
+    ports:
+      - "5014:5000"
+    networks:
+      - buteco_network
+    depends_on:
+      - postgres-db
+      - client-api
+    env_file:
+      - .env
+    restart: unless-stopped
+
+  challenge-api:
+    build: ./challenge_api
+    container_name: challenge_api_container
+    ports:
+      - "5016:5000"
+    networks:
+      - buteco_network
+    depends_on:
+      - postgres-db
+      - client-api
     env_file:
       - .env
     restart: unless-stopped
@@ -105,7 +133,6 @@ services:
       - DATABASE_SCHEMA=${FARM_API_SCHEMA:-farm-api}
     restart: unless-stopped
 
-
   buteco-bot:
     build: ./buteco_bot
     container_name: buteco_bot_container
@@ -118,6 +145,8 @@ services:
       - coin-api
       - bet-api
       - ai-api
+      - political-api
+      - challenge-api
     env_file:
       - .env
     restart: unless-stopped
@@ -139,7 +168,7 @@ services:
       - .env
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -166,5 +195,5 @@ networks:
   buteco_network:
     driver: bridge
 
-volumes: 
+volumes:
   economy_data:
