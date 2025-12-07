@@ -79,7 +79,7 @@ services:
     networks:
       - buteco_network
     depends_on:
-      - postgres-db
+      - database
       - client-api
     env_file:
       - .env
@@ -93,7 +93,7 @@ services:
     networks:
       - buteco_network
     depends_on:
-      - postgres-db
+      - database
       - client-api
     env_file:
       - .env

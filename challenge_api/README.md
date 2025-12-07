@@ -59,7 +59,7 @@ The service will be available at `http://localhost:5016`
 
 ## Environment Variables
 
-- `DB_HOST` - PostgreSQL host (default: postgres-db)
+- `DB_HOST` - PostgreSQL host (default: database)
 - `DB_PORT` - PostgreSQL port (default: 5432)
 - `DB_NAME` - Database name (default: buteco_db)
 - `DB_USER` - Database user
