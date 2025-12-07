@@ -21,7 +21,9 @@ logger = logging.getLogger(__name__)
 def ai_commands(bot):
     """Register AI commands with UI enhancements"""
 
-    @bot.tree.command(name="mestre_dos_magos", description="Consulte a IA usando interface modal")
+    @bot.tree.command(
+        name="mestre_dos_magos", description="Consulte a IA usando interface modal"
+    )
     @app_commands.describe(provider="Modelo de IA (openai, gemini, etc)")
     async def mestre(interaction: discord.Interaction, provider: Optional[str] = None):
         """Ask AI using modal interface"""
@@ -54,7 +56,7 @@ def ai_commands(bot):
                 if status != 200:
                     embed = discord.Embed(
                         title="❌ Saldo Insuficiente",
-                        description=f"Você precisa de **{amount} moedas** para usar a IA.\\nUse `/ver_coins_ui` para verificar seu saldo.",
+                        description=f"Você precisa de **{amount} moedas** para usar a IA.\\nUse `/ver_coins` para verificar seu saldo.",
                         color=discord.Color.red(),
                     )
                     await interaction.followup.send(embed=embed)
@@ -77,7 +79,7 @@ def ai_commands(bot):
             if status != 200:
                 embed = discord.Embed(
                     title="❌ Saldo Insuficiente",
-                    description=f"Você precisa de **{amount} moedas** para usar a IA.\\nUse `/ver_coins_ui` para verificar seu saldo.",
+                    description=f"Você precisa de **{amount} moedas** para usar a IA.\\nUse `/ver_coins` para verificar seu saldo.",
                     color=discord.Color.red(),
                 )
                 await interaction.followup.send(embed=embed)

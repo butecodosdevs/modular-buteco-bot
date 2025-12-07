@@ -173,7 +173,7 @@ def political_commands(bot):
             elif status == 404:
                 embed = discord.Embed(
                     title="❌ Posição Não Encontrada",
-                    description=f"{usuario.mention} ainda não definiu sua posição política.\\n\\nUse `/definir_posicao_politica_ui` para definir!",
+                    description=f"{usuario.mention} ainda não definiu sua posição política.\\n\\nUse `/definir_posicao_politica` para definir!",
                     color=discord.Color.orange(),
                 )
                 embed.add_field(

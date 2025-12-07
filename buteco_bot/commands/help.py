@@ -126,7 +126,7 @@ def help_commands(bot):
 
         embed.add_field(
             name="💡 Dicas",
-            value="• Use `/register` antes de usar comandos de economia\n• Moedas diárias resetam à meia-noite UTC\n• Apostas só podem ser feitas uma vez por evento\n• Verifique `/status` se algo não estiver funcionando",
+            value="• Use `/registrar` antes de usar comandos de economia\n• Moedas diárias resetam à meia-noite UTC\n• Apostas só podem ser feitas uma vez por evento\n• Verifique `/health_check` se algo não estiver funcionando",
             inline=False,
         )
 
