@@ -4,7 +4,7 @@ This guide explains how to generate a new database migration for the `db_migrati
 
 ## Prerequisites
 - Ensure your `User` entity or any other entity is updated in `src/entity/`.
-- Make sure your database service (e.g., `postgres-db`) is running and accessible.
+- Make sure your database service (e.g., `database`) is running and accessible.
 
 ## Steps
 
@@ -18,12 +18,12 @@ This guide explains how to generate a new database migration for the `db_migrati
 2. **Generate the migration**
    - Run the following command from your project root:
      ```sh
-      docker-compose run --rm db-migration-service npm run migration:generate -- src/migration/FistMigration
+      docker-compose run --rm database-migrator npm run migration:generate -- src/migration/FistMigration
      ```
    - Replace `FistMigration` with a descriptive name for your migration. The path must start with `src/migration/` for TypeORM to generate the file in the correct folder.
    - If you use `docker compose` (with a space), the command is the same:
      ```sh
-     docker compose run --rm db-migration-service npm run migration:generate -- src/migration/AddSurnameToUser
+     docker compose run --rm database-migrator npm run migration:generate -- src/migration/AddSurnameToUser
      ```
 
 3. **Check the generated migration**
@@ -32,11 +32,11 @@ This guide explains how to generate a new database migration for the `db_migrati
 4. **Apply the migration** [[Optional]]
    - To run all pending migrations:
      ```sh
-     docker-compose run --rm db-migration-service npm run migration:run
+     docker-compose run --rm database-migrator npm run migration:run
      ```
 
 ## Important: Make migrations visible on your host
-- To ensure generated migration files appear on your local filesystem, add this to your `docker-compose.yml` under the `db-migration-service` service:
+- To ensure generated migration files appear on your local filesystem, add this to your `docker-compose.yml` under the `database-migrator` service:
   ```yaml
   volumes:
     - ./db_migration_service/src/migration:/app/src/migration
@@ -46,7 +46,7 @@ This guide explains how to generate a new database migration for the `db_migrati
 ## Notes
 - The `--rm` flag cleans up the container after the command runs.
 - The migration will be generated based on the difference between your current database schema and your entity definitions.
-- Make sure your database is accessible from the container (host should be `postgres-db` if using the default setup).
+- Make sure your database is accessible from the container (host should be `database` if using the default setup).
 
 ---
 

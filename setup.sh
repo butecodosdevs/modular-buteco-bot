@@ -62,7 +62,7 @@ docker volume rm -f butecobot-reloaded_economy_data
 
 echo ""
 echo "🔄 Building and starting the database migration service..."
-docker compose run --rm db-migration-service npm run migration:run
+docker compose run --rm database-migrator npm run migration:run
 
 echo ""
 echo "🚀 Starting Buteco Bot Ecosystem..."
