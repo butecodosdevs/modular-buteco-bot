@@ -1,0 +1,150 @@
+{
+  "id": "dae176c9-482a-4e1b-a0e3-9b897b3965ff",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "farm_api.farm_items_on_farms": {
+      "name": "farm_items_on_farms",
+      "schema": "farm_api",
+      "columns": {
+        "farm_id": {
+          "name": "farm_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "item_id": {
+          "name": "item_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "farm_items_on_farms_farm_id_farms_id_fk": {
+          "name": "farm_items_on_farms_farm_id_farms_id_fk",
+          "tableFrom": "farm_items_on_farms",
+          "tableTo": "farms",
+          "schemaTo": "farm_api",
+          "columnsFrom": [
+            "farm_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "farm_items_on_farms_item_id_farm_items_id_fk": {
+          "name": "farm_items_on_farms_item_id_farm_items_id_fk",
+          "tableFrom": "farm_items_on_farms",
+          "tableTo": "farm_items",
+          "schemaTo": "farm_api",
+          "columnsFrom": [
+            "item_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "farm_api.farm_items": {
+      "name": "farm_items",
+      "schema": "farm_api",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "farm_item_types",
+          "typeSchema": "farm_api",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "amount": {
+          "name": "amount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "farm_api.farms": {
+      "name": "farms",
+      "schema": "farm_api",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "farms_name_unique": {
+          "name": "farms_name_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "name"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "farm_api.farm_item_types": {
+      "name": "farm_item_types",
+      "schema": "farm_api",
+      "values": [
+        "ANIMAL",
+        "LAND",
+        "UTILITY"
+      ]
+    }
+  },
+  "schemas": {
+    "farm_api": "farm_api"
+  },
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
