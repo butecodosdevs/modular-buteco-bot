@@ -172,10 +172,10 @@ def help_commands(bot):
         )
         embed.add_field(
             name="Repositório",
-            value="[Buteco Bot no GitHub](https://github.com/butecodosdevs/butecobot-reloaded)",
+            value="[Buteco Bot no GitHub](https://github.com/butecodosdevs/modular-buteco-bot)",
             inline=False,
         )
-        embed.set_thumbnail(url="https://github.com/butecodosdevs/butecobot-reloaded")
+        embed.set_thumbnail(url="https://github.com/butecodosdevs/modular-buteco-bot")
         embed.set_footer(
             text="Aceita Contribuições em qualquer linguagem \n\nLeia o README.md e siga o MICROSERVICE_GUIDE.md !"
         )
