@@ -17,7 +17,6 @@ def coins_commands(bot):
     """Register coins commands with UI enhancements"""
     
     @bot.tree.command(name="coins", description="Colete suas moedas diárias com interface interativa")
-    @requires_registration()
     async def coins(interaction: discord.Interaction):
         """Claim daily coins with interactive UI"""
         await interaction.response.defer(ephemeral=True)
