@@ -5,4 +5,5 @@ asyncio
 python-dotenv
 matplotlib
 pillow
-
+plotly
+kaleido
