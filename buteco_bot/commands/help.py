@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 def help_commands(bot):
     @bot.tree.command(
-        name="health", description="Verifique o status de todos os microserviços"
+        name="health_check", description="Verifique o status de todos os microserviços"
     )
     async def health(interaction: discord.Interaction):
         """Check the health status of all microservices."""
@@ -48,7 +48,8 @@ def help_commands(bot):
                         else:
                             status_emoji = "🟡"
                             status_text = f"Status: {response.status}"
-                except:
+                except Exception as e:
+                    logger.error(f"Failed to check service health: {e}")
                     status_emoji = "🔴"
                     status_text = "Offline"
 
@@ -78,55 +79,39 @@ def help_commands(bot):
 
         commands_info = [
             ("👤 **Comandos de Usuário**", ""),
-            ("/register", "Registre-se no sistema de economia"),
-            ("/balance [usuário]", "Verifique seu saldo ou de outro usuário"),
+            ("/registrar", "Registre-se no sistema"),
+            ("/ver_coins [usuário]", "Verifique seu saldo ou de outro usuário"),
             ("", ""),
             ("💰 **Comandos de Economia**", ""),
-            ("/daily", "Colete suas moedas diárias (uma vez por dia)"),
-            (
-                "/transfer <usuário> <valor> [descrição]",
-                "Transfira moedas para outro usuário",
-            ),
+            ("/daily_coins", "Colete suas moedas diárias"),
+            ("/fazer_transferencia <usuário>", "Transfira moedas para outro usuário"),
+            ("/extrato", "Veja seu histórico de transações"),
+            ("/coin_history", "Veja seu histórico de coletas diárias"),
+            ("/faria_limers", "Ranking dos usuários mais ricos"),
             ("", ""),
             ("🎰 **Comandos de Apostas**", ""),
-            (
-                "/bet_create <título> <descrição> <opção1> <opção2>",
-                "Criar nova aposta (Admin)",
-            ),
-            ("/bet_list", "Listar apostas ativas"),
-            ("/bet_info <event_id>", "Ver detalhes de uma aposta"),
-            ("/bet_place <event_id> <opção> <valor>", "Fazer uma aposta"),
-            ("/bet_finalize <event_id> <opção_vencedora>", "Finalizar aposta (Admin)"),
-            ("/bet_cancel <event_id>", "Cancelar aposta e reembolsar (Admin)"),
-            ("/my_bets", "Ver suas apostas"),
-            ("", ""),
-            ("📊 **Comandos de Informação**", ""),
-            ("/leaderboard [limite]", "Mostre os melhores usuários por saldo"),
-            ("/history [limite]", "Veja seu histórico de transações"),
-            ("/daily_history [limite]", "Veja seu histórico de coletas diárias"),
+            ("/criar_evento", "Criar novo evento de aposta (Admin)"),
+            ("/eventos_listar", "Listar eventos ativos"),
+            ("/apostar <event_id>", "Fazer uma aposta em um evento"),
+            ("/evento_admin <event_id>", "Gerenciar evento (Admin)"),
             ("", ""),
             ("🗳️ **Comandos Políticos**", ""),
-            (
-                "/definir_posicao_politica <usuário> <x> <y>",
-                "Define posição política no gráfico 2D",
-            ),
-            (
-                "/ver_posicao_politica <usuário>",
-                "Visualiza posição política de um usuário",
-            ),
-            ("/grafico_politico", "Mostra gráfico com todas as posições políticas"),
+            ("/definir_posicao_politica <usuário>", "Define posição política"),
+            ("/ver_posicao_politica <usuário>", "Visualiza posição política"),
+            ("/grafico_politico", "Mostra gráfico com todas as posições"),
             ("", ""),
             ("🎯 **Desafios**", ""),
-            (
-                "/desafiar <usuário> [descrição]",
-                "Desafiar outro usuário para uma competição",
-            ),
-            ("/desafio_ponto <usuário>", "Adicionar ponto em um desafio ativo"),
+            ("/desafiar <usuário> [descrição]", "Desafiar outro usuário"),
+            ("/desafio_ponto <usuário>", "Adicionar ponto em um desafio"),
             ("/desafio_fechar", "Encerrar um desafio ativo"),
             ("/mostrar_desafio", "Mostrar detalhes de um desafio"),
             ("", ""),
+            ("🤖 **Inteligência Artificial**", ""),
+            ("/mestre_dos_magos [provider]", "Consulte a IA (OpenAI, Gemini, etc)"),
+            ("", ""),
             ("🔧 **Comandos do Sistema**", ""),
-            ("/status", "Verifique o status dos microserviços"),
+            ("/health_check", "Verifique o status dos microserviços"),
+            ("/codigo_fonte", "Link para o repositório do bot"),
             ("/help", "Mostre esta mensagem de ajuda"),
         ]
 
@@ -157,10 +142,13 @@ def help_commands(bot):
                     "Comando de ajuda temporariamente indisponível. Tente novamente mais tarde.",
                     ephemeral=True,
                 )
-            except:
+            except Exception as e:
+                logger.error(f"Failed to send help command response: {e}")
                 pass
 
-    @bot.tree.command(name="codigo", description="Pega o repositório do bot no GitHub")
+    @bot.tree.command(
+        name="codigo_fonte", description="Pega o repositório do bot no GitHub"
+    )
     async def codigo(interaction: discord.Interaction):
         """Get the bot's source code repository."""
         await interaction.response.defer()
@@ -212,5 +200,6 @@ def help_commands(bot):
                 await interaction.followup.send(embed=embed, ephemeral=True)
             else:
                 await interaction.response.send_message(embed=embed, ephemeral=True)
-        except:
+        except Exception as e:
+            logger.error(f"Failed to send error response: {e}")
             pass

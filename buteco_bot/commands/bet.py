@@ -7,8 +7,8 @@ import discord
 import aiohttp
 from tools.utils import make_api_request, get_or_create_user, is_admin, requires_registration
 from tools.constants import BET_API_URL
-from ui.modals import BetCreationModal, PlaceBetModal
-from ui.views import BetEventView, BetSelectionView, ConfirmationView, AdminActionsView
+from ui.modals import BetCreationModal
+from ui.views import BetEventView, BetSelectionView, AdminActionsView
 import logging
 
 logger = logging.getLogger(__name__)
@@ -17,13 +17,13 @@ logger = logging.getLogger(__name__)
 def bet_commands(bot):
     """Register bet commands that use UI components"""
     
-    @bot.tree.command(name="evento_criar", description="Criar uma nova aposta usando interface modal (Admin)")
-    async def evento_criar(interaction: discord.Interaction):
-        """Create a new bet using a modal interface"""
+    @bot.tree.command(name="criar_evento", description="Criar um novo evento de aposta usando interface modal (Admin)")
+    async def criar_evento(interaction: discord.Interaction):
+        """Create a new bet event using a modal interface"""
         if not is_admin(interaction.user):
             embed = discord.Embed(
                 title="❌ Permissão Negada",
-                description="Apenas administradores podem criar apostas.",
+                description="Apenas administradores podem criar eventos de aposta.",
                 color=discord.Color.red()
             )
             await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -48,11 +48,11 @@ def bet_commands(bot):
                 if status == 200:
                     event_id = response.get('eventId', 'Unknown')
                     embed = discord.Embed(
-                        title="🎰 Aposta Criada com Sucesso!",
+                        title="🎰 Evento de Aposta Criado com Sucesso!",
                         description=f"**{title}**\n{description}",
                         color=discord.Color.green()
                     )
-                    embed.add_field(name="ID da Aposta", value=f"`{event_id}`", inline=False)
+                    embed.add_field(name="ID do Evento", value=f"`{event_id}`", inline=False)
                     embed.add_field(name="Opção 1", value=f"🅰️ {option1}", inline=True)
                     embed.add_field(name="Opção 2", value=f"🅱️ {option2}", inline=True)
                     embed.set_footer(text=f"Criado por {interaction.user.display_name}")
@@ -72,20 +72,19 @@ def bet_commands(bot):
                     await interaction.followup.send(embed=embed, view=view)
                 else:
                     embed = discord.Embed(
-                        title="❌ Erro ao Criar Aposta",
-                        description="Falha ao criar a aposta. Tente novamente mais tarde.",
+                        title="❌ Erro ao Criar Evento",
+                        description="Falha ao criar o evento. Tente novamente mais tarde.",
                         color=discord.Color.red()
                     )
                     await interaction.followup.send(embed=embed)
         
-        # Show the modal
         modal = BetCreationModal(callback=handle_bet_creation)
         await interaction.response.send_modal(modal)
     
-    @bot.tree.command(name="evento_apostar", description="Fazer uma aposta usando interface interativa")
+    @bot.tree.command(name="apostar", description="Fazer uma aposta usando interface interativa")
     @app_commands.describe(event_id="ID do evento de aposta")
     @requires_registration()
-    async def evento_apostar(interaction: discord.Interaction, event_id: str):
+    async def apostar(interaction: discord.Interaction, event_id: str):
         """Place a bet using interactive UI"""
         await interaction.response.defer(ephemeral=True)
         
@@ -96,8 +95,8 @@ def bet_commands(bot):
             
             if status == 404:
                 embed = discord.Embed(
-                    title="❌ Aposta Não Encontrada",
-                    description=f"Não foi possível encontrar a aposta com ID `{event_id}`.",
+                    title="❌ Evento Não Encontrado",
+                    description=f"Não foi possível encontrar o evento com ID `{event_id}`.",
                     color=discord.Color.red()
                 )
                 await interaction.followup.send(embed=embed, ephemeral=True)
@@ -105,7 +104,7 @@ def bet_commands(bot):
             elif status != 200:
                 embed = discord.Embed(
                     title="❌ Erro",
-                    description="Falha ao obter informações da aposta.",
+                    description="Falha ao obter informações do evento.",
                     color=discord.Color.red()
                 )
                 await interaction.followup.send(embed=embed, ephemeral=True)
@@ -113,7 +112,6 @@ def bet_commands(bot):
             
             event = response.get('event', {})
             
-            # Create embed with bet info
             embed = discord.Embed(
                 title=f"🎰 {event['title']}",
                 description=event.get('description', ''),
@@ -124,13 +122,11 @@ def bet_commands(bot):
             embed.add_field(name="🅱️ Opção 2", value=event.get('option2', 'Opção 2'), inline=True)
             embed.add_field(name="Pool Total", value=f"{event.get('totalBetAmount', 0):,} moedas", inline=True)
             
-            # Add interactive view
             view = BetEventView(event_id, event, on_bet_callback=handle_place_bet)
             
             await interaction.followup.send(embed=embed, view=view, ephemeral=True)
     
-    @bot.tree.command(name="eventos_listar", description="Listar apostas ativas com interface interativa")
-    @requires_registration()
+    @bot.tree.command(name="eventos_listar", description="Listar eventos ativos")
     async def eventos_listar(interaction: discord.Interaction):
         """List active bets with interactive selection"""
         await interaction.response.defer(ephemeral=True)
@@ -143,7 +139,7 @@ def bet_commands(bot):
             if status != 200:
                 embed = discord.Embed(
                     title="❌ Erro",
-                    description="Falha ao obter lista de apostas ativas.",
+                    description="Falha ao obter lista de eventos ativos.",
                     color=discord.Color.red()
                 )
                 await interaction.followup.send(embed=embed)
@@ -153,22 +149,21 @@ def bet_commands(bot):
             
             if not active_events:
                 embed = discord.Embed(
-                    title="🎰 Apostas Ativas",
-                    description="Nenhuma aposta ativa no momento.",
+                    title="🎰 Eventos Ativos",
+                    description="Nenhum evento ativo no momento.",
                     color=discord.Color.blue()
                 )
                 await interaction.followup.send(embed=embed, ephemeral=True)
                 return
             
             embed = discord.Embed(
-                title="🎰 Apostas Ativas",
-                description=f"Encontradas {len(active_events)} apostas ativas. Selecione uma abaixo:",
+                title="🎰 Eventos Ativos",
+                description=f"Encontrados {len(active_events)} eventos ativos. Selecione um abaixo:",
                 color=discord.Color.blue()
             )
             
             async def handle_selection(interaction: discord.Interaction, selected_event_id: str):
                 """Handle bet selection from dropdown"""
-                # Fetch the selected event details
                 async with aiohttp.ClientSession() as session:
                     status, response = await make_api_request(
                         session, 'GET', f"{BET_API_URL}/bet/event/{selected_event_id}"
@@ -194,14 +189,14 @@ def bet_commands(bot):
             view = BetSelectionView(active_events, on_select_callback=handle_selection)
             await interaction.followup.send(embed=embed, view=view, ephemeral=True)
     
-    @bot.tree.command(name="evento_admin", description="Gerenciar aposta com interface de admin (Admin)")
-    @app_commands.describe(event_id="ID do evento de aposta")
+    @bot.tree.command(name="evento_admin", description="Gerenciar evento com interface de admin (Admin)")
+    @app_commands.describe(event_id="ID do evento")
     async def evento_admin(interaction: discord.Interaction, event_id: str):
-        """Manage bet with admin UI"""
+        """Manage event with admin UI"""
         if not is_admin(interaction.user):
             embed = discord.Embed(
                 title="❌ Permissão Negada",
-                description="Apenas administradores podem gerenciar apostas.",
+                description="Apenas administradores podem gerenciar eventos.",
                 color=discord.Color.red()
             )
             await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -216,8 +211,8 @@ def bet_commands(bot):
             
             if status == 404:
                 embed = discord.Embed(
-                    title="❌ Aposta Não Encontrada",
-                    description=f"Não foi possível encontrar a aposta com ID `{event_id}`.",
+                    title="❌ Evento Não Encontrado",
+                    description=f"Não foi possível encontrar o evento com ID `{event_id}`.",
                     color=discord.Color.red()
                 )
                 await interaction.followup.send(embed=embed)
@@ -237,7 +232,7 @@ def bet_commands(bot):
             embed.add_field(name="🅱️ Opção 2", value=event.get('option2', 'Opção 2'), inline=True)
             
             async def handle_finalize(interaction: discord.Interaction, event_id: str, winning_choice: int):
-                """Handle bet finalization"""
+                """Handle event finalization"""
                 await interaction.response.defer()
                 
                 async with aiohttp.ClientSession() as session:
@@ -252,7 +247,7 @@ def bet_commands(bot):
                     
                     if status == 200:
                         embed = discord.Embed(
-                            title="🏁 Aposta Finalizada!",
+                            title="🏁 Evento Finalizado!",
                             description=f"Opção {winning_choice} foi declarada vencedora!",
                             color=discord.Color.green()
                         )
@@ -267,7 +262,7 @@ def bet_commands(bot):
                         await interaction.followup.send(embed=embed)
             
             async def handle_cancel(interaction: discord.Interaction, event_id: str):
-                """Handle bet cancellation"""
+                """Handle event cancellation"""
                 await interaction.response.defer()
                 
                 async with aiohttp.ClientSession() as session:
@@ -277,8 +272,8 @@ def bet_commands(bot):
                     
                     if status == 200:
                         embed = discord.Embed(
-                            title="❌ Aposta Cancelada",
-                            description="A aposta foi cancelada e todos foram reembolsados.",
+                            title="❌ Evento Cancelado",
+                            description="O evento foi cancelado e todos foram reembolsados.",
                             color=discord.Color.orange()
                         )
                         await interaction.followup.send(embed=embed)

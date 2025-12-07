@@ -34,7 +34,6 @@ def challenge_commands(bot):
         challenged_id = str(user.id)
         channel_id = str(interaction.channel_id)
 
-        # Prevent self-challenge
         if challenger_id == challenged_id:
             embed = discord.Embed(
                 title="❌ Erro",

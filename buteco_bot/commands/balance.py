@@ -7,7 +7,7 @@ import aiohttp
 from tools.utils import get_or_create_user, make_api_request, requires_registration
 from tools.constants import BALANCE_API_URL, CLIENT_API_URL
 from ui.modals import TransferCoinsModal
-from ui.views import ConfirmationView, PaginationView
+from ui.views import PaginationView
 import logging
 
 logger = logging.getLogger(__name__)
@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 def balance_commands(bot):
     """Register balance commands with UI enhancements"""
     
-    @bot.tree.command(name="transferir", description="Transfira moedas usando interface modal")
+    @bot.tree.command(name="fazer_transferencia", description="Transfira moedas usando interface modal")
     @app_commands.describe(recipient="O usuário para quem transferir moedas")
     @requires_registration()
     async def transferir(interaction: discord.Interaction, recipient: discord.Member):
@@ -106,8 +106,7 @@ def balance_commands(bot):
         modal = TransferCoinsModal(recipient=recipient, callback=handle_transfer)
         await interaction.response.send_modal(modal)
     
-    @bot.tree.command(name="top_patroes", description="Ranking dos usuários mais ricos com interface visual")
-    @requires_registration()
+    @bot.tree.command(name="faria_limers", description="Ranking dos usuários mais ricos com interface visual")
     async def top_patroes(interaction: discord.Interaction):
         """Show leaderboard with enhanced UI"""
         await interaction.response.defer()
@@ -157,7 +156,8 @@ def balance_commands(bot):
                     try:
                         discord_user = bot.get_user(int(user['discordId']))
                         display_name = discord_user.display_name if discord_user else user['name']
-                    except:
+                    except Exception as e:
+                        logger.error(f"Erro ao obter nome do usuário: {e}")
                         display_name = user['name']
                     
                     embed.add_field(
@@ -183,7 +183,6 @@ def balance_commands(bot):
                 await interaction.followup.send(embed=pages[0], view=view)
     
     @bot.tree.command(name="extrato", description="Veja seu histórico de transações com paginação")
-    @requires_registration()
     async def extrato(interaction: discord.Interaction):
         """Show transaction history with pagination"""
         await interaction.response.defer(ephemeral=True)
@@ -249,7 +248,8 @@ def balance_commands(bot):
                         from datetime import datetime
                         dt = datetime.fromisoformat(created_at.replace('Z', '+00:00'))
                         date_str = dt.strftime('%d/%m/%Y %H:%M')
-                    except:
+                    except Exception as e:
+                        logger.error(f"Erro ao formatar data: {e}")
                         date_str = "Desconhecido"
                     
                     embed.add_field(

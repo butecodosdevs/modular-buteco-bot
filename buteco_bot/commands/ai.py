@@ -21,9 +21,8 @@ logger = logging.getLogger(__name__)
 def ai_commands(bot):
     """Register AI commands with UI enhancements"""
 
-    @bot.tree.command(name="mestre", description="Consulte a IA usando interface modal")
+    @bot.tree.command(name="mestre_dos_magos", description="Consulte a IA usando interface modal")
     @app_commands.describe(provider="Modelo de IA (openai, gemini, etc)")
-    @requires_registration()
     async def mestre(interaction: discord.Interaction, provider: Optional[str] = None):
         """Ask AI using modal interface"""
 

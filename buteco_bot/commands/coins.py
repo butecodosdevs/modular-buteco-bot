@@ -7,7 +7,7 @@ import aiohttp
 from typing import Optional
 from tools.utils import get_or_create_user, make_api_request, requires_registration
 from tools.constants import BALANCE_API_URL, COIN_API_URL
-from ui.views import ConfirmationView, PaginationView
+from ui.views import PaginationView
 import logging
 
 logger = logging.getLogger(__name__)
@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 def coins_commands(bot):
     """Register coins commands with UI enhancements"""
     
-    @bot.tree.command(name="coins", description="Colete suas moedas diárias com interface interativa")
+    @bot.tree.command(name="daily_coins", description="Colete suas moedas diárias com interface interativa")
     async def coins(interaction: discord.Interaction):
         """Claim daily coins with interactive UI"""
         await interaction.response.defer(ephemeral=True)
@@ -33,7 +33,6 @@ def coins_commands(bot):
             if status == 200:
                 amount = response.get('amount', 0)
                 
-                # Get updated balance
                 status_balance, balance_data = await make_api_request(
                     session, 'GET', f"{BALANCE_API_URL}/balance/{user_data['id']}"
                 )
@@ -47,7 +46,7 @@ def coins_commands(bot):
                 embed.add_field(name="💰 Saldo Atual", value=f"{current_balance:,} moedas", inline=True)
                 embed.add_field(name="⏰ Próxima Coleta", value="Volte amanhã!", inline=True)
                 embed.set_thumbnail(url=interaction.user.display_avatar.url)
-                embed.set_footer(text=f"Continue coletando diariamente para acumular moedas!")
+                embed.set_footer(text="Continue coletando diariamente para acumular moedas!")
                 
             elif status == 400:
                 embed = discord.Embed(
@@ -66,7 +65,6 @@ def coins_commands(bot):
         await interaction.followup.send(embed=embed, ephemeral=True)
     
     @bot.tree.command(name="ver_coins", description="Verifique seu saldo com interface visual")
-    @requires_registration()
     async def ver_coins(interaction: discord.Interaction, user: Optional[discord.Member] = None):
         """Check balance with enhanced UI"""
         await interaction.response.defer(ephemeral=True)
@@ -94,7 +92,7 @@ def coins_commands(bot):
                 
                 embed = discord.Embed(
                     title=f"💰 Carteira de {target_user.display_name}",
-                    description=f"Informações financeiras completas",
+                    description="Informações financeiras completas",
                     color=discord.Color.blue()
                 )
                 embed.add_field(
@@ -120,9 +118,8 @@ def coins_commands(bot):
         
         await interaction.followup.send(embed=embed, ephemeral=True)
     
-    @bot.tree.command(name="historico_de_coins", description="Veja seu histórico de coletas com paginação")
-    @requires_registration()
-    async def historico_de_coins(interaction: discord.Interaction):
+    @bot.tree.command(name="coin_history", description="Veja seu histórico de coletas com paginação")
+    async def coin_history(interaction: discord.Interaction):
         """Show coin history with pagination"""
         await interaction.response.defer(ephemeral=True)
         
@@ -156,7 +153,6 @@ def coins_commands(bot):
                 await interaction.followup.send(embed=embed, ephemeral=True)
                 return
             
-            # Create pages (10 items per page)
             items_per_page = 10
             pages = []
             
@@ -177,7 +173,8 @@ def coins_commands(bot):
                         from datetime import datetime
                         dt = datetime.fromisoformat(claim_date)
                         date_str = dt.strftime('%d/%m/%Y')
-                    except:
+                    except Exception as e:
+                        logger.error(f"Erro ao formatar data: {e}")
                         date_str = claim_date
                     
                     embed.add_field(
