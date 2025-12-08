@@ -174,7 +174,7 @@ If your service needs database access:
 3. Generate and run a migration:
 
    ```bash
-   docker-compose run --rm db-migration-service npm run migration:generate -- src/migration/AddYourEntity
+   docker-compose run --rm database-migrator npm run migration:generate -- src/migration/AddYourEntity
    ```
 
 ## Step 4: Adding to Docker Compose
@@ -193,7 +193,7 @@ services:
     networks:
       - buteco_network
     depends_on:
-      - postgres-db
+      - database
       # Add other dependencies as needed
     env_file:
       - .env

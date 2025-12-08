@@ -19,7 +19,7 @@ services:
     networks:
       - buteco_network
     depends_on:
-      - postgres-db
+      - database
       - balance-api
       - client-api
     env_file:
@@ -48,13 +48,13 @@ services:
     networks:
       - buteco_network
     depends_on:
-      - postgres-db
+      - database
     env_file:
       - .env
     restart: unless-stopped
 
   ai-api:
-    build: 
+    build:
       context: .
       dockerfile: ./ai_api/Dockerfile
     container_name: ai_api_container
@@ -79,7 +79,7 @@ services:
     networks:
       - buteco_network
     depends_on:
-      - postgres-db
+      - database
       - client-api
     env_file:
       - .env
@@ -93,10 +93,44 @@ services:
     networks:
       - buteco_network
     depends_on:
-      - postgres-db
+      - database
       - client-api
     env_file:
       - .env
+    restart: unless-stopped
+
+  farm-migrator:
+    build:
+      context: ./farm_api
+      target: migrator
+    container_name: farm_migrator_container
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@database:${DB_PORT}/${DB_NAME}
+      - DATABASE_SCHEMA=${FARM_API_SCHEMA:-farm-api}
+    env_file:
+      - .env
+    networks:
+      - buteco_network
+    restart: "no"
+
+  farm-api:
+    build: ./farm_api
+    container_name: farm_api_container
+    ports:
+      - "8081:3000"
+    networks:
+      - buteco_network
+    depends_on:
+      database:
+        condition: service_healthy
+      farm-migrator:
+        condition: service_completed_successfully
+    environment:
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@database:${DB_PORT}/${DB_NAME}
+      - DATABASE_SCHEMA=${FARM_API_SCHEMA:-farm-api}
     restart: unless-stopped
 
   buteco-bot:
@@ -106,7 +140,7 @@ services:
       - buteco_network
     depends_on:
       - client-api
-      - db-migration-service
+      - database-migrator
       - balance-api
       - coin-api
       - bet-api
@@ -117,9 +151,9 @@ services:
       - .env
     restart: unless-stopped
 
-  postgres-db:
+  database:
     image: postgres:14
-    container_name: postgres_db_container
+    container_name: database_container
     ports:
       - "5432:5432"
     environment:
@@ -134,18 +168,18 @@ services:
       - .env
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  db-migration-service:
+  database-migrator:
     build: ./db_migration_service
-    container_name: db_migration_service_container
+    container_name: database-migrator_container
     depends_on:
-      - postgres-db
+      - database
     environment:
-      - DB_HOST=postgres-db
+      - DB_HOST=database
       - DB_PORT=5432
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
@@ -161,5 +195,5 @@ networks:
   buteco_network:
     driver: bridge
 
-volumes: 
+volumes:
   economy_data:
